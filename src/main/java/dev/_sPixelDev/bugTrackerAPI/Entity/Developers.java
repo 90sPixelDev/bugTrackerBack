@@ -14,7 +14,7 @@ public class Developers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer dev_id;
+    private Integer devId;
 
-    private String dev_name;
+    private String devName;
 }
