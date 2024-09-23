@@ -6,6 +6,7 @@ import dev._sPixelDev.bugTrackerAPI.Repository.DeveloperRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,31 @@ public class DeveloperController {
         }
         catch (HttpClientErrorException e) {
             return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), pageNumber);
+        }
+    };
+
+    @GetMapping("/get/alldevs")
+    public ResponseEntity<Object> getDevelopersOptimized (@RequestParam(defaultValue = "0") int pageNumber) {
+
+        try {
+            Pageable pageOptions = PageRequest.of(pageNumber, 20);
+            Page<Developers> devs = developerRepo.getAllDevsOptimized(pageOptions);
+            return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Data successfully received", devs.getContent());
+        }
+        catch (HttpClientErrorException e) {
+            return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), pageNumber);
+        }
+    };
+
+    @GetMapping("/get/dev")
+    public ResponseEntity<Object> getDeveloperById (@RequestParam int devId) {
+
+        try {
+            Developers dev = developerRepo.getDevById(devId);
+            return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Data successfully received", dev);
+        }
+        catch (HttpClientErrorException e) {
+            return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), devId);
         }
     };
 
