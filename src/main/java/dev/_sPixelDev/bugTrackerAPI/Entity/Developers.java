@@ -14,14 +14,7 @@ public class Developers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int dev_id;
+    private Integer dev_id;
 
     private String dev_name;
-
-    @ManyToMany
-    private List<Project> projects;
-
-    @OneToMany(mappedBy = "bug_id")
-    private List<Bugs> bugs_assigned;
-
 }

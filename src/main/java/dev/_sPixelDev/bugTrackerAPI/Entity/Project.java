@@ -16,10 +16,10 @@ public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int project_id;
+    private Integer project_id;
 
     private String project_title;
 
-    @ManyToMany(mappedBy = "dev_id")
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Developers> developers;
 }
