@@ -17,4 +17,7 @@ public class Developers {
     private Integer devId;
 
     private String devName;
+
+    @ManyToMany(mappedBy = "devs", fetch = FetchType.LAZY)
+    private List<Project> projects;
 }

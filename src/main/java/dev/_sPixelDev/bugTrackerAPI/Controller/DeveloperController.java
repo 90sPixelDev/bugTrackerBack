@@ -2,7 +2,9 @@ package dev._sPixelDev.bugTrackerAPI.Controller;
 
 import dev._sPixelDev.bugTrackerAPI.Entity.Developers;
 import dev._sPixelDev.bugTrackerAPI.Entity.HttpResponseHandler;
+import dev._sPixelDev.bugTrackerAPI.Entity.Project;
 import dev._sPixelDev.bugTrackerAPI.Repository.DeveloperRepo;
+import dev._sPixelDev.bugTrackerAPI.Repository.ProjectRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,11 @@ public class DeveloperController {
 
     @Autowired
     public void setDeveloperRepo(DeveloperRepo developerRepo) { this.developerRepo = developerRepo;}
+
+    private ProjectRepo projectRepo;
+
+    @Autowired
+    public void setProjectRepo(ProjectRepo projectRepo) {this.projectRepo = projectRepo; }
 
     @GetMapping("/get/devs")
     public ResponseEntity<Object> getDevelopers (@RequestParam(defaultValue = "0") int pageNumber) {
@@ -67,6 +74,23 @@ public class DeveloperController {
         }
         catch (HttpClientErrorException e) {
             return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), dev);
+        }
+    };
+
+    @PutMapping("update/dev/{devId}/{projectId}")
+    public ResponseEntity<Object> addDevProject(@PathVariable String devId, @PathVariable String projectId) {
+
+        try {
+            Project project = projectRepo.findById(Integer.valueOf(projectId)).get();
+            Developers dev = developerRepo.findById(Integer.valueOf(devId)).get();
+
+            dev.getProjects().add(project);
+            developerRepo.save(dev);
+
+            return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Successfully updated project info in database", dev);
+        }
+        catch (HttpClientErrorException e){
+            return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), null);
         }
     };
 

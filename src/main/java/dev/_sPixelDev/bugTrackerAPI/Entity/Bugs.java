@@ -1,19 +1,22 @@
 package dev._sPixelDev.bugTrackerAPI.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bugs")
-@Getter
-@Setter
 public class Bugs {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Integer bugId;
 
     @Getter
@@ -28,9 +31,14 @@ public class Bugs {
     @Setter
     private LocalDateTime timeCreated;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project projectId;
+    @Getter
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project projects;
 
-    private Enum priority;
+    @Getter
+    @Setter
+    @NonNull
+    private String priority;
 }

@@ -1,12 +1,14 @@
 package dev._sPixelDev.bugTrackerAPI.Controller;
 
 import dev._sPixelDev.bugTrackerAPI.Entity.Bugs;
+import dev._sPixelDev.bugTrackerAPI.Entity.Developers;
 import dev._sPixelDev.bugTrackerAPI.Entity.HttpResponseHandler;
 import dev._sPixelDev.bugTrackerAPI.Entity.Project;
 import dev._sPixelDev.bugTrackerAPI.Repository.BugRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,24 @@ public class BugController {
     public void setBugRepo(BugRepo bugRepo) { this.bugRepo = bugRepo;}
 
     @GetMapping("/get/bugs")
-    public ResponseEntity<Object> getDevelopers (@RequestParam(defaultValue = "0") int pageNumber) {
+    public ResponseEntity<Object> getBugs (@RequestParam(defaultValue = "0") int pageNumber) {
 
         try {
             Page<Bugs> bugs = bugRepo.findAll(PageRequest.of(pageNumber, 20, Sort.Direction.ASC, "bugId"));
+            return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Data successfully received", bugs.getContent());
+        }
+        catch (HttpClientErrorException e) {
+            return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), pageNumber);
+        }
+    };
+
+    @GetMapping("/get/allbugs")
+    public ResponseEntity<Object> getAllBugs (@RequestParam(defaultValue = "0") int pageNumber) {
+
+        try {
+
+            Pageable pageOptions = PageRequest.of(pageNumber, 20);
+            Page<Bugs> bugs = bugRepo.getAllBugsListQry(pageOptions);
             return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Data successfully received", bugs.getContent());
         }
         catch (HttpClientErrorException e) {
@@ -57,16 +73,16 @@ public class BugController {
                 bug.setBugName(bugData.getBugName());
                 bugRepo.save(bug);
             }
-            if (bugData.getProjectId() != bug.getProjectId()) {
-                bug.setProjectId(bugData.getProjectId());
-                bugRepo.save(bug);
-            }
-            if (bugData.getBugDescription() != bug.getBugDescription()) {
+            if (!bugData.getBugDescription().equals(bug.getBugDescription())) {
                 bug.setBugDescription(bugData.getBugDescription());
                 bugRepo.save(bug);
             }
-            if (bugData.getPriority() != bug.getPriority()) {
+            if (!bugData.getPriority().equals(bug.getPriority())) {
                 bug.setPriority(bugData.getPriority());
+                bugRepo.save(bug);
+            }
+            if (bugData.getProjects() != bug.getProjects()) {
+                bug.setProjects(bugData.getProjects());
                 bugRepo.save(bug);
             }
             return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Successfully updated project info in database", bugData);

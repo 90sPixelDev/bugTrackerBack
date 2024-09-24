@@ -3,6 +3,7 @@ package dev._sPixelDev.bugTrackerAPI.Controller;
 import dev._sPixelDev.bugTrackerAPI.Entity.Developers;
 import dev._sPixelDev.bugTrackerAPI.Entity.HttpResponseHandler;
 import dev._sPixelDev.bugTrackerAPI.Entity.Project;
+import dev._sPixelDev.bugTrackerAPI.Repository.DeveloperRepo;
 import dev._sPixelDev.bugTrackerAPI.Repository.ProjectRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,11 @@ public class ProjectsController {
 
     @Autowired
     public void setProjectRepo(ProjectRepo projectRepo) {this.projectRepo = projectRepo; }
+
+    private DeveloperRepo developerRepo;
+
+    @Autowired
+    public void setDeveloperRepo(DeveloperRepo developerRepo) { this.developerRepo = developerRepo;}
 
     @GetMapping("/get/projects")
     public ResponseEntity<Object> getProjects (@RequestParam(defaultValue = "0") int pageNumber) {
@@ -57,14 +63,27 @@ public class ProjectsController {
                 project.setProjectTitle(projectData.getProjectTitle());
                 projectRepo.save(project);
             }
-            if (projectData.getDevelopers() != project.getDevelopers()) {
-                project.setDevelopers(projectData.getDevelopers());
-                projectRepo.save(project);
-            }
             return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Successfully updated project info in database", project);
         }
         catch (HttpClientErrorException e){
             return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), projectData);
+        }
+    };
+
+    @PutMapping("update/project/{projectId}/{devId}")
+    public ResponseEntity<Object> updateProjectAddDev(@PathVariable String projectId, @PathVariable String devId) {
+
+        try {
+            Project project = projectRepo.findById(Integer.valueOf(projectId)).get();
+            Developers dev = developerRepo.findById(Integer.valueOf(devId)).get();
+
+            project.getDevs().add(dev);
+            projectRepo.save(project);
+
+            return HttpResponseHandler.generateResponse(HttpStatus.OK, false, "Successfully updated project info in database", project);
+        }
+        catch (HttpClientErrorException e){
+            return HttpResponseHandler.generateResponse(e.getStatusCode(), true, e.getLocalizedMessage(), null);
         }
     };
 

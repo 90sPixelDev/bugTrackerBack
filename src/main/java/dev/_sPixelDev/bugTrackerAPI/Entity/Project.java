@@ -1,5 +1,7 @@
 package dev._sPixelDev.bugTrackerAPI.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -7,14 +9,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "projects")
-@EntityListeners(AuditingEntityListener.class)
 public class Project {
 
     @Id
@@ -34,6 +34,14 @@ public class Project {
 
     @Getter
     @Setter
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Developers> developers;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "projects_devs",
+            joinColumns = {
+                    @JoinColumn(name = "dev_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "project_id")
+            }
+    )
+    private List<Developers> devs;
 }
