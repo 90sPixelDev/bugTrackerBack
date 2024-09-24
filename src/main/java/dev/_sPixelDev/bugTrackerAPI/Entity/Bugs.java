@@ -34,8 +34,8 @@ public class Bugs {
     @Getter
     @Setter
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project projects;
+    @JoinColumn(name = "project", nullable = false)
+    private Project project;
 
     @Getter
     @Setter
